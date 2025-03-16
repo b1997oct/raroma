@@ -1,103 +1,115 @@
-import Image from "next/image";
+import CreateProfile from "@/components/CreateProfile";
+import Layout from "@/components/Layout";
+import Sidebar from "@/components/Sidebar";
+import ViewButton from "@/components/ViewButton";
+import Profile from "@/db/Tables/Profile";
+import School from "@/db/Tables/School";
+import first_subdomain from "@/lib/first_subdomain";
+import Token from "@/lib/Token";
+import { Metadata } from "next";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { Button } from "rsuite";
 
-export default function Home() {
+const getSub = async () => {
+  const headersList = await headers()
+  const host = headersList.get("host")
+  const [subdomain] = host.split(".")
+  const isSub = await Profile.findOne({ subdomain })
+  return isSub
+}
+export async function generateMetadata(): Promise<Metadata> {
+
+  let title = "Rorame - Register School", desp = "Register today"
+  const isSub = await getSub()
+
+  if (isSub) {
+    let { school_name, description } = await School.findOne({ user: isSub._id })
+    title = "Rorame - " + school_name
+    desp = description
+  }
+
+  return {
+    title,
+    description: desp,
+    openGraph: {
+      title,
+      description: desp
+    }
+  }
+}
+
+export default async function Home(props) {
+
+
+  let data,
+    isSub = await getSub()
+
+  if (isSub) {
+    data = await School.findOne({ user: isSub._id })
+  } else {
+    data = await School.aggregate([
+      {
+        $lookup: {
+          from: "profiles",
+          localField: "user",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      {
+        $unwind: "$user"
+      }
+    ])
+  }
+
+  let user
+  try {
+    const t = await Token.user()
+    user = t.user
+  } catch (error) { }
+
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <Layout active="Home" user={user}>
+      {!isSub && <p className="text-center mt-4">Wellcome to Rorame</p>}
+      <h1 className="text-4xl md:text-6xl font-bold text-center mt-20 bg-gradient-to-r from-blue-800 to-indigo-900 bg-clip-text text-transparent">Build Your School Profile at Rorame</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {isSub ?
+        <div className="flex justify-center mt-10">
+          <div className="border w-full max-w-xl p-4 rounded-sm">
+            <h2 className="text-4xl text-red-500">{data.school_name}</h2>
+            <div className="mt-2">{data.email} | {data.phone}</div>
+            <br />
+            <h4 className="font-semibold">Description</h4>
+            <div>{data.description}</div>
+            <br />
+            <h4 className="font-semibold">Address</h4>
+            <div>{data.address}</div>
+
+            {isSub._id == user && <Link href={"/school"}><Button>Edit</Button></Link>}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        :
+        <>
+          <CreateProfile />
+          <br />
+          <br />
+          <h3 className="text-center">Registerd School</h3>
+          <br />
+          <div className="flex justify-center m-4 mb-20">
+            <div className="w-full max-w-xl">
+              {data.map((d, i) => <div key={d._id} className="border w-full p-4 rounded-sm mb-8">
+                <h3>{i + 1}. {d.school_name}</h3>
+                <div className="mt-2">{d.email} | {d.phone}</div>
+                {/* <div>{d.address}</div> */}
+
+                <ViewButton isEdit={user == d.user._id} subdomain={d.user.subdomain} />
+
+              </div>)}
+            </div>
+          </div>
+        </>}
+    </Layout>
   );
 }

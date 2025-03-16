@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import "./globals.css";
+import 'rsuite/dist/rsuite-no-reset.min.css';
+import "@/db";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+
+const fonts = Poppins({
+  // variable: "--font-geist-sans",
   subsets: ["latin"],
+  weight: ["500"]
 });
 
 const geistMono = Geist_Mono({
@@ -25,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${fonts.className} antialiased`}
       >
         {children}
       </body>
