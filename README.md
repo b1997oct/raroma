@@ -18,4 +18,12 @@ Rest you can follow browser
 
 if the user goes to subdomain that is not found in database then also its shows default page content
 
+Features Implemented
+Home Page
+Form Validations
+Login Page
+Signup Page
+Edit School Page with protected route
+Sub domain based school profile showing
+
 <!--  -->
