@@ -3,46 +3,77 @@ import React, { ReactNode } from 'react'
 import Sidebar from './Sidebar'
 import NavItem, { NavItemProps } from 'rsuite/esm/Nav/NavItem';
 import { Button, Nav } from 'rsuite';
-import base_url from '@/lib/base_url';
+import get_base_url from '@/lib/get_base_url';
+import Token from '@/lib/Token';
+import { headers } from 'next/headers';
+import Profile from '@/db/Tables/Profile';
+import { Logout } from './TokenSignIn';
 
 type Props = {
     active: "Home" | "Login" | "Signup" | "Admin" | "School";
     children: ReactNode;
     user?: string;
 }
-export default function Layout({ active, children, user }: Props) {
+export default async function Layout({ active, children }: Props) {
+
+    const headersList = await headers()
+    const origin = "http://" + headersList.get("host")
+    let isRarome = origin == get_base_url()
+
+
+    let user, subdomain
+    try {
+        const t = await Token.user()
+        user = t.user
+        if (isRarome) {
+            let data = await Profile.findById(user)
+            subdomain = data.subdomain
+        }
+    } catch (error) { }
 
     const isLogin = Boolean(user)
 
     return (
         <div>
-            <div className="p-4 shadow flex gap-4 sticky top-0 bg-white">
-                <h3 className="text-2xl font-semibold flex-1"><Link href={base_url}>Rorame</Link></h3>
+            <div className="p-4 z-10 shadow flex gap-4 sticky top-0 bg-white">
+                <div className='flex gap-2 flex-1 items-center'>
+                    <h3 className="text-2xl font-semibold">
+                        <Link href={get_base_url()}>Rorame</Link>
+                    </h3>
+                    {subdomain &&
+                        <>
+                            |
+                            <Link href={get_base_url(subdomain)}>Dashboard</Link>
+                        </>}
+                </div>
+
                 <Nav className="hidden md:flex gap-4">
-                    <MyLink href={base_url} active={active == "Home"}>Home</MyLink>
+                    <MyLink href={"/"} active={active == "Home"}>Home</MyLink>
                     {isLogin ?
                         <>
                             <MyLink href={'/school'} active={active == "School"}>My School</MyLink>
-                            <Link href={'/logout'}><Button color='red' appearance='primary'>Logout</Button></Link>
+                            <Logout />
                         </>
                         :
                         <>
                             <MyLink href={'/login'} active={active == "Login"}>Login</MyLink>
                             <MyLink href={'/signup'} active={active == "Signup"}>Signup</MyLink>
+                            <MyLink href={'/admin'} >Admin</MyLink>
                         </>}
                 </Nav>
                 <Sidebar>
                     <Nav className="grid gap-4 place-content-center">
-                        <MyLink href={'/'} active={active == "Home"}>Home</MyLink>
+                        <MyLink href={"/"} active={active == "Home"}>Home</MyLink>
                         {isLogin ?
                             <>
                                 <MyLink href={'/school'} active={active == "School"}>My School</MyLink>
-                                <Link href={'/logout'}><Button color='red' appearance='primary'>Logout</Button></Link>
+                                <Logout />
                             </>
                             :
                             <>
-                                <MyLink href={'/login'} active={active == "Login"}>Login</MyLink>
-                                <MyLink href={'/signup'} active={active == "Signup"}>Signup</MyLink>
+                                <MyLink href={get_base_url() + '/login'} active={active == "Login"}>Login</MyLink>
+                                <MyLink href={get_base_url() + '/signup'} active={active == "Signup"}>Signup</MyLink>
+                                <MyLink href={get_base_url() + '/admin'} >Admin</MyLink>
                             </>}
                     </Nav>
                 </Sidebar>
@@ -52,6 +83,6 @@ export default function Layout({ active, children, user }: Props) {
     )
 }
 
-const MyLink = (props: NavItemProps) => {
-    return <NavItem as={Link} {...props} />
+const MyLink = ({ href, ...props }: NavItemProps) => {
+    return <NavItem as={Link} href={href} {...props} />
 }

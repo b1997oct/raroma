@@ -1,8 +1,8 @@
 import { jwtVerify, SignJWT } from "jose";
-import { createSecretKey } from "crypto";
 import { cookies } from "next/headers";
+import { base_host } from "./base_url";
 
-const secret = createSecretKey(Buffer.from("secret-key", "utf-8"));
+const secret = new TextEncoder().encode("secret-key");
 
 class Token {
     constructor() { }
@@ -27,9 +27,11 @@ class Token {
         return token
     }
 
-    static async get() {
+
+
+    static async get(name = "token") {
         const cookie = await cookies()
-        return cookie.get("token").value
+        return cookie.get(name)?.value
     }
 
     static async user() {
@@ -39,9 +41,31 @@ class Token {
         return { user, role }
     }
 
+    static async admin_login({ user, role = "admin" }) {
+        const token = await this.create({ user: user.toString(), role }, { expireIn: "1D" })
+        const cookie = await cookies()
+        await cookie.set("admin", token, { path: "/", maxAge: 60 * 60 * 24, httpOnly: true })
+        return token
+    }
+
+    static async admin() {
+        const token = await this.get("admin")
+        const { user, role } = await this.verify(token)
+        if (role != "admin") {
+            throw Error("admin not login")
+        }
+        return { user, role }
+    }
+
     static async logout() {
         const cookie = await cookies()
         cookie.delete("token")
+    }
+
+
+    static async admin_logout() {
+        const cookie = await cookies()
+        cookie.delete("admin")
     }
 
 }

@@ -7,6 +7,7 @@ import useForm, { UseFormSchema } from '@/hooks/useForm'
 import axios from 'axios'
 import Link from 'next/link'
 import make_subdomain from '@/lib/make_subdomain'
+import get_base_url from '@/lib/get_base_url'
 
 const schema: UseFormSchema = [
     {
@@ -41,10 +42,8 @@ export default function Login() {
             setLoading(true)
             const { data: res } = await axios.post('/api/login', data)
             let { subdomain, token } = res
-            let url = make_subdomain(subdomain)
-            url = url + "/token?token=" + token
-            setHref(url)
-            setTimeout(() => hrefRef.current.click(), 1000)
+            window.location.href = get_base_url(subdomain) + `?token=` + token;
+            // location.replace(`/success?token=${token}&subdomain=${subdomain}`)
         } catch (error) {
             setMessage(error.response?.data?.message || error.message)
         } finally {
@@ -56,7 +55,6 @@ export default function Login() {
     return (
         <div className='grid gap-4 w-full max-w-sm p-4 rounded shadow-sm mt-10'>
             <h3>Login</h3>
-            <a ref={hrefRef} href={href}></a>
             {schema.map(d => <Input key={d.name} {...inputProps(d)} />)}
             {/* <div className='df jce'><button className='link'>Forgot Password</button></div> */}
             {message && <div className='text-error'>{message}</div>}

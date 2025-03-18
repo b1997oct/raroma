@@ -28,3 +28,8 @@ h3 {
 .text-error {
   @apply text-red-500
 }
+
+td, th {
+  padding: 1rem;
+text-align: start;
+}

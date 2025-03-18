@@ -3,6 +3,7 @@
 import Input from '@/components/Input'
 import useForm, { UseFormSchema } from '@/hooks/useForm'
 import base_url from '@/lib/base_url'
+import get_base_url from '@/lib/get_base_url'
 import make_subdomain from '@/lib/make_subdomain'
 import axios from 'axios'
 import Link from 'next/link'
@@ -39,7 +40,7 @@ const schema: UseFormSchema = [
         name: "phone",
         label: "Phone No. (,) for multiple",
         placeholder: "Enter Phone No.",
-        error: { required: true, minlength: 10, maxlength: 100 }
+        error: { required: true, maxlength: 100 }
     },
     {
         name: "address",
@@ -128,8 +129,15 @@ function From({ payload }) {
                 return
             }
 
-            await axios.put('/api/school', data)
-            location.replace('/')
+            const { data: res } = await axios.put('/api/school', data)
+
+            let { subdomain, token } = res
+            if (token) {
+                await axios.get('/logout')
+                window.location.href = get_base_url(subdomain) + "?token=" + token;
+            } else {
+                location.replace('/')
+            }
         } catch (error) {
             setMessage(error.response?.data?.message || error.message)
         }

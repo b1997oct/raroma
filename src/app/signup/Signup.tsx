@@ -2,6 +2,7 @@
 
 import Input from '@/components/Input'
 import useForm, { UseFormSchema } from '@/hooks/useForm'
+import get_base_url from '@/lib/get_base_url'
 import axios from 'axios'
 import { useState } from 'react'
 import { Button } from 'rsuite'
@@ -18,7 +19,7 @@ const schema: UseFormSchema = [
         name: "email",
         label: "Email",
         placeholder: "example@mail.com",
-        error: { required: true,  maxlength: 100 }
+        error: { required: true, maxlength: 100 }
     },
     {
         name: "phone",
@@ -49,10 +50,10 @@ export default function SignUp() {
             }
             setLoading(true)
             const { data: res } = await axios.post('/api/signup', data)
-            // localStorage.setItem("token", res.token)
-            location.replace("/school")
+            let { subdomain, token } = res
+            window.location.href = get_base_url(subdomain) + "?token=" + token;
         } catch (error) {
-            setMessage(error.data.message)
+            setMessage(error.response?.data?.message || error.message)
         } finally {
             setLoading(false)
         }

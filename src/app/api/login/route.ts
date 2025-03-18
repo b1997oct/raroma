@@ -2,6 +2,8 @@ import Profile from "@/db/Tables/Profile"
 import School from "@/db/Tables/School"
 import Token from "@/lib/Token"
 import { cookies } from "next/headers"
+import bcrypt from "bcrypt";
+
 
 export const POST = async (req: Request) => {
     try {
@@ -11,10 +13,11 @@ export const POST = async (req: Request) => {
         if (!data) {
             return Response.json({ message: "user not found" }, { status: 404 })
         }
-        if (data.password != password) {
+        let is_match = await bcrypt.compare(password, data.password)
+        if (!is_match) {
             return Response.json({ message: "enter a valid password" }, { status: 400 })
         }
-        const user = data._id
+        const user = data._id.toString()
         const token = await Token.create({ user, role: "user" })
         await Token.login({ user })
         return Response.json({ token, subdomain: data?.subdomain })
