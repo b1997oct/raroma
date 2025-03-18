@@ -48,9 +48,8 @@ added admin go to  -> login & check all the data
 
 at page "/"
 if not subdomain found then it will be redirected to base domain 
-http://school1.localhost:3000 --> valid sub-domain > do nothing
-http://school2.localhost:3000 --> valid sub-domain > do nothing 
+http://school1.localhost:3000 --> valid sub-domain > do nothing & not auth required
+http://school2.localhost:3000 --> valid sub-domain > do nothing --||--
 http://not-subdomain.localhost:3000 --> in valid sub-domain > redirect to http://localhost:3000
 
-mongodb not supporting on edge run time so i implimented at page level tannet
-<!--  -->
+<!-- end -->
