@@ -30,12 +30,20 @@ Sub domain based school profile showing
 
 2nd time submit
 
+added JWT for tokeniztion
+added bcrypt for password hashing
+
+
 "/school" --> url
 protected
 Added subdomain validation subdomain must be unique
 When user change subdomain he will be automatically signin to his new subdomain
 
-added admin go to "/admin" --> login & check all the data
+
+"/admin"
+added admin go to  -> login & check all the data
+"/admin/*" -> protected redirect to '/admin'
+
 
 
 at page "/"
