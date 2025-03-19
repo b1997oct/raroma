@@ -18,36 +18,26 @@ Rest you can follow browser
 
 if the user goes to subdomain that is not found in database then also its shows default page content
 
-Features Implemented
-Home Page
-Form Validations
-Login Page
-Signup Page
-Edit School Page with protected route
-Sub domain based school profile showing
-
-
-
-2nd time submit
+*Features Implemented*
 
 added JWT for tokeniztion
 added bcrypt for password hashing
 
 
-"/school" --> url
+ at "/school" --> url
 protected
 Added subdomain validation subdomain must be unique
 When user change subdomain he will be automatically signin to his new subdomain
 
 
-"/admin"
+ at "/admin"
 added admin go to  -> login & check all the data
 "/admin/*" -> protected redirect to '/admin'
 
 
 
-at page "/"
-if not subdomain found then it will be redirected to base domain 
+ at page "/"
+if not subdomain found then it will be redirected to base domain
 http://school1.localhost:3000 --> valid sub-domain > do nothing & not auth required
 http://school2.localhost:3000 --> valid sub-domain > do nothing --||--
 http://not-subdomain.localhost:3000 --> in valid sub-domain > redirect to http://localhost:3000
