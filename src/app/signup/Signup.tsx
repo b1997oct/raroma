@@ -65,7 +65,7 @@ export default function SignUp() {
             {schema.map(d => <Input key={d.name} {...inputProps(d)} />)}
             {message && <div className='text-error'>{message}</div>}
             <Button onClick={onSubmit} loading={loading} appearance='primary'>Signup</Button>
-            <div>Already have an Account? <a href='/login' className='link'>Login</a></div>
+            <div>Already have an Account? <a href='/' className='link'>Go Home</a></div>
         </div>
     )
 }

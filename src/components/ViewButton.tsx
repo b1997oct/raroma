@@ -8,7 +8,7 @@ export default function ViewButton({ isEdit, subdomain }) {
         <div className="flex justify-end gap-4">
             {isEdit && <Link href={'/school'}><Button color='red' appearance="primary" >Edit</Button></Link>}
             <Link href={`http://${subdomain}.localhost:3000`}>
-                <Button appearance="primary">View</Button>
+                <Button appearance="primary">Go to </Button>
             </Link>
         </div>
     )

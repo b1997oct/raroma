@@ -1,14 +1,11 @@
 "use client"
-
 import Input from '@/components/Input'
 import useForm, { UseFormSchema } from '@/hooks/useForm'
 import base_url from '@/lib/base_url'
 import get_base_url from '@/lib/get_base_url'
-import make_subdomain from '@/lib/make_subdomain'
 import axios from 'axios'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { Button, Loader, Progress } from 'rsuite'
+import { useEffect, useRef, useState } from 'react'
+import { Button, Loader, Modal } from 'rsuite'
 
 
 const schema: UseFormSchema = [
@@ -80,14 +77,40 @@ const addresSchema: UseFormSchema = [
 ]
 
 
-export default function School() {
+
+export default function SchoolEdit({ id }) {
+
+    const [open, setOpen] = useState(false)
+    const is_touched = useRef(null)
+
+
+    return <div>
+        <button
+            onClick={() => {
+                is_touched.current = true
+                setOpen(true)
+            }}>Edit</button>
+        <Modal open={open} onClose={() => setOpen(false)}>
+            <Modal.Header>
+                <Modal.Title>Edit School</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {is_touched.current && <EditForm id={id} />}
+            </Modal.Body>
+        </Modal>
+    </div>
+}
+
+function EditForm({ id }) {
     const [payload, setPayload] = useState(null)
     const [loading, setLoading] = useState(true)
     const [message, setMessage] = useState("")
 
     const getData = async () => {
         try {
-            const { data } = await axios.get('/api/school')
+            setMessage("")
+            setLoading(true)
+            const { data } = await axios.post('/api/school', { id })
             setPayload(data)
         } catch (error) {
             setMessage(error.response?.data?.message || error.message)
@@ -101,15 +124,13 @@ export default function School() {
         getData()
     }, [])
 
-    const onLogout = () => location.replace(base_url)
 
     return <div className='flex flex-col items-center justify-center my-10'>
         {loading && <div className='w-full max-w-sm text-center'> <Loader color='red' /> "Loading..."</div>}
         {message && <div>
             <p className='text-error'>{message}</p>
             <div className='flex gap-4'>
-                <Button appearance='ghost' onClick={() => location.reload()}>Reload</Button>
-                <Button color='red' appearance='primary' onClick={onLogout}>Logout?</Button>
+                <Button appearance='ghost' onClick={() => getData()}>Refresh</Button>
             </div>
         </div>}
         {!loading && <From payload={payload} />}
@@ -128,16 +149,10 @@ function From({ payload }) {
                 setTouched(true)
                 return
             }
-
+            data.user = payload.user
+            data.id = payload._id
             const { data: res } = await axios.put('/api/school', data)
-
-            let { subdomain, token } = res
-            if (token) {
-                await axios.get('/logout')
-                window.location.href = get_base_url(subdomain) + "?token=" + token;
-            } else {
-                location.replace('/')
-            }
+            location.reload()
         } catch (error) {
             setMessage(error.response?.data?.message || error.message)
         }

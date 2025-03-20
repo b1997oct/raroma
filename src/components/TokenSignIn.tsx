@@ -32,7 +32,7 @@ export const Logout = () => {
     const onLogout = () => {
         axios.get("/logout")
             .then(res => {
-                location.href = get_base_url() + "/logout?base=yes"
+                location.href = "/login"
             })
             .catch(error => {
                 alert(error.response?.data?.message || error.message)

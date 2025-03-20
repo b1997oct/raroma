@@ -29,9 +29,6 @@ export default function Login() {
     const { data, inputProps, isError, setTouched } = useForm({ schema })
     const [message, setMessage] = useState("")
     const [loading, setLoading] = useState(false)
-    const [href, setHref] = useState("/")
-    const hrefRef = useRef<HTMLAnchorElement>(null)
-
 
     const onSubmit = async () => {
         try {
@@ -41,9 +38,7 @@ export default function Login() {
             }
             setLoading(true)
             const { data: res } = await axios.post('/api/login', data)
-            let { subdomain, token } = res
-            window.location.href = get_base_url(subdomain) + `?token=` + token;
-            // location.replace(`/success?token=${token}&subdomain=${subdomain}`)
+            location.replace("/")
         } catch (error) {
             setMessage(error.response?.data?.message || error.message)
         } finally {
@@ -59,7 +54,9 @@ export default function Login() {
             {/* <div className='df jce'><button className='link'>Forgot Password</button></div> */}
             {message && <div className='text-error'>{message}</div>}
             <Button onClick={onSubmit} loading={loading} appearance='primary'>LOGIN</Button>
-            <div>Don't have an Account? <Link href='/signup' className='link'>Sign UP</Link></div>
+            <div>Don't have an Account? <Link href={get_base_url() + '/signup'} className='link'>Sign Up</Link></div>
+            <div className='text-center my-2'>OR</div>
+            <div className='flex justify-center gap-2'>Go to <Link className='link' href={get_base_url()}>Rorame</Link></div>
         </div>
     )
 }

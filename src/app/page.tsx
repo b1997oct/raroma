@@ -1,12 +1,10 @@
 import CreateProfile from "@/components/CreateProfile";
 import Layout from "@/components/Layout";
-import Sidebar from "@/components/Sidebar";
 import TokenSignIn from "@/components/TokenSignIn";
 import ViewButton from "@/components/ViewButton";
 import Profile from "@/db/Tables/Profile";
 import School from "@/db/Tables/School";
 import { base_host } from "@/lib/base_url";
-import first_subdomain from "@/lib/first_subdomain";
 import get_base_url from "@/lib/get_base_url";
 import Token from "@/lib/Token";
 import { Metadata } from "next";
@@ -64,13 +62,8 @@ export default async function Home({ searchParams }) {
     return <TokenSignIn token={token} />
   }
 
-
-  const headersList = await headers()
-  const host = headersList.get("host")
   if (isSub) {
     data = await School.findOne({ user: isSub._id })
-  } else if (host != base_host) {
-    redirect(get_base_url())
   } else {
     data = await School.aggregate([
       {
@@ -129,9 +122,11 @@ export default async function Home({ searchParams }) {
                 <h3>{i + 1}. {d.school_name}</h3>
                 <div className="mt-2">{d.email} | {d.phone}</div>
                 {/* <div>{d.address}</div> */}
-
-                <ViewButton isEdit={user == d.user._id} subdomain={d.user.subdomain} />
-
+                <div className="mt-4 flex justify-end">
+                  <Link href={get_base_url(d.user.subdomain)}>
+                    <Button appearance="primary">Go to</Button>
+                  </Link>
+                </div>
               </div>)}
             </div>
           </div>

@@ -2,6 +2,7 @@ import React from 'react'
 import SchoolForm from './School'
 import Layout from '@/components/Layout'
 import Token from '@/lib/Token'
+import SchoolLayout from '../SchoolLayout'
 
 export default async function Page() {
 
@@ -9,12 +10,14 @@ export default async function Page() {
   try {
     const t = await Token.user()
     user = t.user
-  } catch (error) { }
+  } catch (error) {
+
+  }
 
 
   return (
-    <Layout active='School' user={user}>
+    <SchoolLayout active="School">
       <SchoolForm />
-    </Layout>
+    </SchoolLayout>
   )
 }

@@ -12,41 +12,27 @@ npm run dev
 
 Open [http://localhost:3000] with your browser to see the result.
 
-Rest you can follow browser
-
-/school path is protected path and only available to correct owner
-
-if the user goes to subdomain that is not found in database then also its shows default page content
 
 *Features Implemented*
 
-added JWT for tokeniztion
-added bcrypt for password hashing
+ JWT for tokeniztion
+ bcrypt for password hashing
 
+ *implimented subdomain based routing*
+ 1. http://school1.localhost:3000 --> school1
+ 2. http://school2.localhost:3000 --> school2
 
- *at "/school"*
- 1. protected
- 2. Added subdomain validation subdomain must be unique
+ *Data is isolated to its subdomain*
+    1. http://school2.localhost:3000 only school2 accounts can only login using this url
 
- 3. When user change subdomain he will be automatically signin to his new subdomain
-
+ *at [subdomain]/school*
+ 1. protected only access by school
+ 2. school can edit its profile
 
  *at "/admin"*
- 1. added admin go to  -> login & check all the data
+ 1. added admin go to  -> login
+    Login Creds : email = admin@test.com & password= admin
 
-"/admin/*" -> 
-2. protected redirect to '/admin'
-
-
-
- *at page "/"*
- if not subdomain found then it will be redirected to base domain
-
- http://school1.localhost:3000 --> valid sub-domain > do nothing & not auth required
-
- http://school2.localhost:3000 --> valid sub-domain > do nothing --||--
-
- http://not-subdomain.localhost:3000 --> in valid sub-domain > redirect to http://localhost:3000
-
+ 2. [/admin/*] protected redirect to */admin*
 
 <!-- end -->

@@ -3,11 +3,14 @@ import Token from "@/lib/Token"
 import bcrypt from "bcrypt";
 
 
-export const POST = async (req: Request) => {
+export const POST = async (req: Request, { params }) => {
+    console.log('req: ', req);
     try {
         const { email, password } = await req.json()
 
-        let data = await Profile.findOne({ email })
+        const { subdomain } = await params
+        let data = await Profile.findOne({ _id: subdomain, email })
+        console.log('data: ', data);
         if (!data) {
             return Response.json({ message: "user not found" }, { status: 404 })
         }

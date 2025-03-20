@@ -5,12 +5,12 @@ import generate_subdomain from "@/lib/generate_subdomain";
 import Token from "@/lib/Token";
 
 
-export const GET = async (req: Request) => {
+export const POST = async (req: Request) => {
     try {
-        const { user } = await Token.user()
-        console.log('user: ', user);
-        let data = await School.findOne({ user })
-        let { subdomain } = await Profile.findById(user)
+        await Token.admin()
+        const { id } = await req.json()
+        let data = await School.findById(id)
+        let { subdomain } = await Profile.findById(data.user)
 
         if (data) {
             data = JSON.stringify(data)
@@ -26,45 +26,24 @@ export const GET = async (req: Request) => {
 
 
 type Props = any
-// export const POST = async (req: Request) => {
-//     try {
-//         const body = await req.json() as Props
-
-//         let { user } = await Token.user()
-
-//         let data = await School.findOne({ user })
-//         if (data) {
-//             throw Error("school alredy linked with profile")
-//         }
-//         const subdomain = generate_subdomain(body.school_name)
-//         body.user = user
-//         data = await new School(body).save()
-//         return Response.json(data)
-//     } catch (error) {
-//         return Response.json({ message: error.message }, { status: 500 })
-//     }
-// }
-
-
 export const PUT = async (req: Request) => {
     try {
-        let token, { subdomain = "", ...body } = await req.json() as Props
-        const { user } = await Token.user()
+
+        await Token.admin()
+
+        let { subdomain, id, user, ...body } = await req.json() as Props
+
         if (subdomain) {
             subdomain = generate_subdomain(subdomain)
             const is_taken = await Profile.findOne({ user: { $ne: user }, subdomain })
             if (is_taken) {
-                throw Error("subdomain is taken contact admin to change it")
+                throw Error("subdomain is taken")
             }
             await Profile.findByIdAndUpdate(user, { subdomain })
-            token = await Token.get()
         }
-        let data = await School.findOneAndUpdate({ user }, body)
-        if (!data) {
-            body.user = user
-            await new School(body).save()
-        }
-        return Response.json({ token, subdomain })
+        let data = await School.findByIdAndUpdate(id, body)
+
+        return Response.json(data)
     } catch (error) {
         return Response.json({ message: error.message }, { status: 500 })
     }

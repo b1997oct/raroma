@@ -31,7 +31,6 @@ export default async function Layout({ active, children }: Props) {
         }
     } catch (error) { }
 
-    const isLogin = Boolean(user)
 
     return (
         <div>
@@ -49,32 +48,15 @@ export default async function Layout({ active, children }: Props) {
 
                 <Nav className="hidden md:flex gap-4">
                     <MyLink href={"/"} active={active == "Home"}>Home</MyLink>
-                    {isLogin ?
-                        <>
-                            <MyLink href={'/school'} active={active == "School"}>My School</MyLink>
-                            <Logout />
-                        </>
-                        :
-                        <>
-                            <MyLink href={'/login'} active={active == "Login"}>Login</MyLink>
-                            <MyLink href={'/signup'} active={active == "Signup"}>Signup</MyLink>
-                            <MyLink href={'/admin'} >Admin</MyLink>
-                        </>}
+                    <MyLink href={'/signup'} active={active == "Signup"}>School Signup</MyLink>
+                    <MyLink href={'/admin'} >Admin Login</MyLink>
+
                 </Nav>
                 <Sidebar>
                     <Nav className="grid gap-4 place-content-center">
                         <MyLink href={"/"} active={active == "Home"}>Home</MyLink>
-                        {isLogin ?
-                            <>
-                                <MyLink href={'/school'} active={active == "School"}>My School</MyLink>
-                                <Logout />
-                            </>
-                            :
-                            <>
-                                <MyLink href={get_base_url() + '/login'} active={active == "Login"}>Login</MyLink>
-                                <MyLink href={get_base_url() + '/signup'} active={active == "Signup"}>Signup</MyLink>
-                                <MyLink href={get_base_url() + '/admin'} >Admin</MyLink>
-                            </>}
+                        <MyLink href={'/signup'} active={active == "Signup"}>School Signup</MyLink>
+                        <MyLink href={get_base_url() + '/admin'} >Admin Login</MyLink>
                     </Nav>
                 </Sidebar>
             </div>
