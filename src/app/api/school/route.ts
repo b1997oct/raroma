@@ -1,4 +1,5 @@
 
+import set_subdomains from "@/db/set_subdomains";
 import Profile from "@/db/Tables/Profile";
 import School from "@/db/Tables/School";
 import generate_subdomain from "@/lib/generate_subdomain";
@@ -39,6 +40,7 @@ export const PUT = async (req: Request) => {
             if (is_taken) {
                 throw Error("subdomain is taken")
             }
+            await set_subdomains()
             await Profile.findByIdAndUpdate(user, { subdomain })
         }
         let data = await School.findByIdAndUpdate(id, body)

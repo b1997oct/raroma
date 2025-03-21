@@ -1,3 +1,4 @@
+import set_subdomains from "@/db/set_subdomains";
 import Profile from "@/db/Tables/Profile"
 import Token from "@/lib/Token";
 import bcrypt from "bcrypt";
@@ -20,6 +21,7 @@ export const POST = async (req: Request) => {
         let subdomain = await gen_unique_subdomain()
         data = await new Profile({ email, password, subdomain, ...others }).save()
         const token = await Token.login({ user: data._id.toString() })
+        await set_subdomains()
         return Response.json({ token, subdomain })
     } catch (error) {
         return Response.json({ message: error.message }, { status: 500 })
