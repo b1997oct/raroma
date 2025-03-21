@@ -13,11 +13,10 @@ export default async function middleware({ nextUrl, headers, url, ...req }: Next
     const host = headers.get("host")
     const subdomain = host.replace(`.${base_host}`, "")
     const account = data[subdomain]
-    console.log('account: ', account);
 
     try {
-
         if (account) {
+            console.log('account: ', account);
             return NextResponse.rewrite(new URL(`/${account}${nextUrl.pathname}`, url));
         }
 
